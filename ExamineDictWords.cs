@@ -434,6 +434,7 @@ namespace ExamineDictWords
 
                 double totalVariance = CategoryVariancesRaw[i]["S"] / (TotalNumberOfDocs["Docs"] - 1);
 
+                //https://data.library.virginia.edu/using-and-interpreting-cronbachs-alpha/
                 //double CronbachRaw = (k / (k - 1)) * ((totalVariance - itemVarianceSum) / totalVariance);
                 double CronbachRaw = (k / (k - 1)) * (1 - (itemVarianceSum / totalVariance));
                 if (!Double.IsNaN(CronbachRaw) && !Double.IsInfinity(CronbachRaw))

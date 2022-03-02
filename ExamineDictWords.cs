@@ -24,7 +24,7 @@ namespace ExamineDictWords
 
         public string PluginName { get; } = "Evaluate Dictionary Words";
         public string PluginType { get; } = "Corpus Tools";
-        public string PluginVersion { get; } = "1.0.6";
+        public string PluginVersion { get; } = "1.1.0";
         public string PluginAuthor { get; } = "Ryan L. Boyd (ryan@ryanboyd.io)";
         public string PluginDescription { get; } = "This plugin will take a LIWC-formatted dictionary file and scan your texts, providing word-level output across your dataset. This plugin is particularly helpful for when you are interested in understanding which words in your dictionary are making the largest contribution to each of the dictionary's categories." + Environment.NewLine + Environment.NewLine +
                                                    "Output can be generated as raw frequencies or relative frequencies (i.e., LIWC style). Note that output scores are averaged across all documents. It is recommended that you use this plugin in conjunction with the \"Omit Observations\" plugin to help avoid skew, particularly if you are opting for the \"relative frequency\" output, which is the default -- this will help avoid skewing issues introduced by texts with very few words." + Environment.NewLine + Environment.NewLine +
@@ -130,7 +130,7 @@ namespace ExamineDictWords
                     foreach (string key in Results.Keys)
                     {
                         for (int j = 0; j < UserLoadedDictionary.DictData.NumCats; j++) EntryFreqTracker_Long[key][j] += Results[key][j];
-                        for (int j = 0; j < UserLoadedDictionary.DictData.NumCats; j++) EntryFreqTracker_Double[key][j] += (double)Results[key][j] / Input.StringArrayList[i].Length;
+                        for (int j = 0; j < UserLoadedDictionary.DictData.NumCats; j++) EntryFreqTracker_Double[key][j] += ((double)Results[key][j] / Input.StringArrayList[i].Length);
                     }
 
 
@@ -166,7 +166,7 @@ namespace ExamineDictWords
                             {
                                 if (Results[term][j] > 0)
                                 {
-                                    if (x == 0) x = ((double)Results[term][j] / Input.StringArrayList[i].Length);
+                                    if (x == 0) x = (((double)Results[term][j] / (double)Input.StringArrayList[i].Length)) * 100;
 
                                     TempCatSumTrackerOneHot[j] += x_OneHot;
                                     TempCatSumTrackerRaw[j] += x;
@@ -520,13 +520,13 @@ namespace ExamineDictWords
                     }
                     else
                     {
-                        OutputArray[j] = Math.Round(((EntryFreqTracker_Double[UserLoadedDictionary.DictData.AllEntries[i]][j] / TotalNumberOfDocs["Docs"]) * 100), RoundValuesToNDecimals, MidpointRounding.AwayFromZero).ToString(StringOutputFormatParameter);
+                        OutputArray[j] = Math.Round(((EntryFreqTracker_Double[UserLoadedDictionary.DictData.AllEntries[i]][j] / TotalNumberOfDocs["Docs"])) * 100, RoundValuesToNDecimals, MidpointRounding.AwayFromZero).ToString(StringOutputFormatParameter);
                     }
 
                     //calculate the standard deviation
                     if (IncludeStDevs) 
                     { 
-                        OutputArray[j] += " (" + Math.Round(Math.Sqrt(TermVariancesRaw[UserLoadedDictionary.DictData.AllEntries[i]]["S"]), RoundValuesToNDecimals, MidpointRounding.AwayFromZero).ToString(StringOutputFormatParameter) + ")";
+                        OutputArray[j] += " (" + Math.Round(Math.Sqrt(TermVariancesRaw[UserLoadedDictionary.DictData.AllEntries[i]]["S"] / (TotalNumberOfDocs["Docs"] - 1)), RoundValuesToNDecimals, MidpointRounding.AwayFromZero).ToString(StringOutputFormatParameter) + ")";
                     }
 
                 }
